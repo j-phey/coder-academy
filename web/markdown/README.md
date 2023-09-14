@@ -41,4 +41,5 @@ git commit -m "Intial commit"
 - Open the [GitHub](https://github.com) home page
 - [Placeholder image of kitten](https://placekitten.com/200)
 - ![Preview of kitten](https://placekitten.com/200)
+- ![Preview of kitten](https://placekitten.com/400)
 - ![Preview of puppy](https://place-puppy.com/200x200)
