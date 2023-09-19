@@ -1,0 +1,53 @@
+/* asterisks is a wildcard.
+This is called a '(CSS) Reset' 
+Recommended to always have these 5 lines in your CSS*/
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+h1, body > p {
+    /* [body > p] refers to all p that are children of body */
+    background-color: #dde0e3;
+}
+
+h1 {
+    padding: 4rem;
+    border: double red;
+    border-width: 0.5vw 1vw;
+    /* vw = viewing width, vh = viewing height */
+}
+
+body > p {
+    padding: 1rem 2rem;
+    margin: 1rem;
+    /* [CAN USE SHORTHAND] padding: 2rem 2rem 1rem 1rem; */
+    /* padding-top: 2rem;
+    padding-bottom: 2rem;
+    padding-left: 1rem;
+    padding-right: 1rem; */
+}
+
+em, strong {
+    /* display:block; */
+    background-color: #edb229;
+}
+
+.btn {
+    color: white;
+    background-color: #5995da;
+    font-weight: bold;
+    padding: 1.5rem;
+    text-align: center;
+    border: 2px solid blue;
+    font-size: 1.5rem;
+    border-radius: 0.5rem;
+    width: 33%;
+    box-sizing: border-box;
+}
+
+.btn img {
+    width: 50%;
+}
+
