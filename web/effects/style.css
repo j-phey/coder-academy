@@ -1,0 +1,41 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+@keyframes colorful-text { /* @keyframes is a 'directive' */
+    0% {
+        background: salmon;
+    }
+    50% {
+        background: blue;
+        transform: translate(100px);
+    }
+    100% {
+        background:greenyellow;
+        transform: translate(100px) rotate(45deg);
+    }
+}
+
+div {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    background: salmon;
+    /* transition: width 1s, height 2s, background 3s; */
+    /* transition: width ease-in-out 3s 2s; ease-in-out is default */
+    /* transform: rotate(-15deg); */
+    transition: transform 2s;
+    /* animation: colorful-text 2s; */
+}
+
+div:hover {
+    /* width: 200px; */
+    /* left: 0; */
+    /* height: 50vh; */
+    /* background: blue; */
+    /* transform: rotate(90deg) scale(2); */
+    /* animation: colorful-text 1s infinite alternate; */
+    animation: colorful-text 3s 1 alternate both ;
+}
