@@ -1,10 +1,41 @@
 class Character:
 
-    def __init__(self, name, race):
+    def __init__(self, name, race, health, attack):
         self.name = name
         self.race = race
         # self.copper = 0
+        self.health = health
+        self.attack = attack 
         self.inv = Inventory([], 0, 0, 0)
+    
+    def battle(self, other):
+        print(f"{self.name} attacks {other.name}!")
+        # match(self.role):
+            # case 'Wizard':
+                # print(f"{self.name} attacks {other.name} with a spell!")
+            # case 'Burglar':
+                # print(f"{self.name} attacks {other.name} with a sneaking skill!")
+
+class Ranger(Character): # INHERITS the character class (all attr and methods)
+
+    # The Ranger battle class overrides the Character battle class
+    def battle(self, other): 
+        print(f"{self.name} attacks {other.name} with a Ranger skill!")
+
+    def recruit_undead(self):
+        pass
+
+class Mage(Character): 
+    def battle(self, other): 
+        print(f"{self.name} attacks {other.name} with a Frost skill!")
+
+class Burglar(Character): 
+    def battle(self, other): 
+        print(f"{self.name} attacks {other.name} with a sneaky stab skill!")
+
+class Wizard(Character): 
+    def battle(self, other): 
+        print(f"{self.name} attacks {other.name} with a Fireball skill!")
 
 class Chest:
 
