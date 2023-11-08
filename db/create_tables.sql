@@ -25,5 +25,12 @@ create table items (
     description text not null,
     
     category_id integer not null,
-    foreign key (category_id) references categories (id)
+    foreign key (category_id) references categories (id) on delete cascade 
+    -- 'on delete cascade' means if the primary key is deleted, delete the records of the foreign key too (i.e. any references in the 'items' table)
 );
+
+insert into items (name, description, category_id) values
+    ('Skyrim', 'Awesome open world RPG', 4),
+    ('World of Warcraft', 'Popular MMORPG', 4),
+    ('iPhone', 'Flagship smartphone by Apple', 1),
+    ('Greg Norman golf clubs', 'Look like a pro!', 3);
