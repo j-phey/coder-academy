@@ -178,3 +178,5 @@ FROM STUDENTS ST, ENROLLMENTS E, SUBJECTS SU, TEACHERS T
 WHERE ST.student_id = E.student_id 
 AND E.subject_id = SU.subject_id 
 AND SU.teacher_id = T.teacher_id;
+
+SELECT test
