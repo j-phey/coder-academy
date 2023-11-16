@@ -2,8 +2,10 @@ from flask import Flask, jsonify
 from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
 from datetime import date
+import json
+
 app = Flask(__name__) # Always required to begin Flask app
-ma = Marshmallow(app)
+ma = Marshmallow(app) # Create an instance of Marshmallow and connect with our 'app'
 
 # Set the database URI via SQLAlchemy
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://trello_dev:spameggs123@127.0.0.1:5432/trello'
@@ -20,14 +22,16 @@ class Card(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100))
     description = db.Column(db.Text())
+    status = db.Column(db.Text())
     date_created = db.Column(db.Date())
 
 # create the Card Schema with Marshmallow, 
 # it will provide the serialization needed for converting the data into JSON
+# aka is serializes the data - converts it into JSON
 class CardSchema(ma.Schema):
     class Meta:
         # Fields to expose
-        fields = ("id", "title", "description", "date", "status", "priority")
+        fields = ("id", "title", "description", "status", "date_created")
 
 # single card schema, when one card needs to be retrieved
 card_schema = CardSchema()
@@ -47,18 +51,21 @@ def db_seed():
         Card(
             title = 'Start the project',
             description = 'Stage 1 - Create ERD',
+            status='Done',
             date_created = date.today()
         ),
 
         Card(
             title = 'ORM Queries',
             description = 'Stage 2 - Implement Crud',
+            status='In Progress',
             date_created = date.today()
         ),
 
         Card(
             title = 'Marshmallow',
             description = 'Stage 3 - Implement JSONify of models',
+            status='In Progress',
             date_created = date.today()
         ) ,
     ]
@@ -73,16 +80,48 @@ def db_seed():
 
     print('Database seeded')
 
+
+# CLI COMMANDS
+
+# @app.cli.command('all_cards')
+# def all_cards():
+#     # select * from cards;
+#     stmt = db.select(Card).order_by(Card.title.desc()) # Pass the class itself as a paramater that you want to SELECT on. 
+#     print(stmt)
+#     # This produces:  SELECT cards.id, cards.title, cards.description, cards.date_created 
+#                     # FROM cards
+    
+#     # cards = db.session.execute(stmt)
+#     # print(cards.all()) # Produces: [(<Card 1>,), (<Card 2>,), (<Card 3>,)]
+    
+#     cards = db.session.scalars(stmt).all()
+#     # print(cards.all()) # Produces [<Card 1>, <Card 2>, <Card 3>]
+
+#     for card in cards:
+#         print(card.__dict__) 
+
+
+@app.route('/cards')
+def all_cards():
+    # select * from cards;
+    stmt = db.select(Card).order_by(Card.title.desc()) # Pass the class itself as a paramater that you want to SELECT on. 
+    cards = db.session.scalars(stmt).all()
+    return CardSchema(many=True).dump(cards) # dumps returns a string (text/html), dump serializes to the native language (Python) / JSON
+
+
 # Define an index/home page route
 @app.route('/')
 def index():
     return 'Hello world!'
 
-@app.route("/cards", methods=["GET"])
+# Create a route for when a user calls GET /cards
+@app.route("/cardss", methods=["GET"])
 def get_cards():
     #get all the cards from the database table
     stmt = db.select(Card)
     cards = db.session.scalars(stmt)
+    # return CardSchema(many=True).dump(cards)
+
     # Convert the cards from the database into a JSON format and store them in result
     result = cards_schema.dump(cards)
     #return result in JSON format
