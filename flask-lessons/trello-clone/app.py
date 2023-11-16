@@ -114,15 +114,15 @@ def all_cards():
 def index():
     return 'Hello world!'
 
-# Create a route for when a user calls GET /cards
-@app.route("/cardss", methods=["GET"])
-def get_cards():
-    #get all the cards from the database table
-    stmt = db.select(Card)
-    cards = db.session.scalars(stmt)
-    # return CardSchema(many=True).dump(cards)
+# # Create a route for when a user calls GET /cards
+# @app.route("/cardss", methods=["GET"])
+# def get_cards():
+#     #get all the cards from the database table
+#     stmt = db.select(Card)
+#     cards = db.session.scalars(stmt)
+#     # return CardSchema(many=True).dump(cards)
 
-    # Convert the cards from the database into a JSON format and store them in result
-    result = cards_schema.dump(cards)
-    #return result in JSON format
-    return jsonify(result)
+#     # Convert the cards from the database into a JSON format and store them in result
+#     result = cards_schema.dump(cards)
+#     #return result in JSON format
+#     return jsonify(result)
