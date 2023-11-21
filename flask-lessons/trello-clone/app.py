@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
 from datetime import date
@@ -50,6 +50,11 @@ class User(db.Model): # SPECIFYING A USERS TABLE
     email = db.Column(db.String, nullable=False, unique=True) # Cannot be null, i.e. it's required. Every user must be unique with email address.
     password = db.Column(db.String, nullable=False)
     is_admin = db.Column(db.Boolean, default=False) # Should they have admin rights
+
+# Use Marshmallow
+class UserSchema(ma.Schema):
+    class Meta:
+        fields = ('id', 'name', 'email', 'password', 'is_admin')
 
 @app.cli.command('db_create') # Creates the tables above
 def db_create():
@@ -128,6 +133,25 @@ def db_seed():
 #     for card in cards:
 #         print(card.__dict__) 
 
+@app.route('/users/register', methods=['POST'])
+def register():
+    # Parse incoming POST body through the schema
+    user_info = UserSchema(exclude=['id']).load(request.json) # Runs through UserSchema to provide field validation
+    
+    # Create a new user with the parsed data
+    user = User(
+        email=user_info['email'],
+        password=bcrypt.generate_password_hash(user_info['password']).decode('utf8'),
+        name=user_info.get('name', '')
+    )
+    
+    # Add and commit the new user to the database
+    db.session.add(user)
+    db.session.commit()
+
+    # Return the new user
+    return UserSchema(exclude=['password']).dump(user), 201 # does not pass password back 
+
 
 @app.route('/cards')
 def all_cards():
@@ -135,7 +159,6 @@ def all_cards():
     stmt = db.select(Card).order_by(Card.title.desc()) # Pass the class itself as a paramater that you want to SELECT on. 
     cards = db.session.scalars(stmt).all()
     return CardSchema(many=True).dump(cards) # dumps returns a string (text/html), dump serializes to the native language (Python) / JSON
-
 
 # Define an index/home page route
 @app.route('/')
