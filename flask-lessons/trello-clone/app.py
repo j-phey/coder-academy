@@ -14,7 +14,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://trello_dev:spameg
 db = SQLAlchemy(app)
 
 # Create a SQL model - it's an entity in our database. 
-# This is our Card entity
+# This is our Card entity / TABLE
 class Card(db.Model):
     __tablename__ = 'cards' # Sets the table name to 'cards' (instead of 'card')
 
@@ -22,8 +22,8 @@ class Card(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100))
     description = db.Column(db.Text())
-    status = db.Column(db.Text())
-    date_created = db.Column(db.Date())
+    status = db.Column(db.Text) # You technically don't need parenthesis if not specifying a limit
+    date_created = db.Column(db.Date) 
 
 # create the Card Schema with Marshmallow, 
 # it will provide the serialization needed for converting the data into JSON
@@ -39,14 +39,38 @@ card_schema = CardSchema()
 #multiple card schema, when many cards need to be retrieved
 cards_schema = CardSchema(many=True)
 
-@app.cli.command('db_create')
+class User(db.Model): # SPECIFYING A USERS TABLE
+    __tablename__ = 'users'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    email = db.Column(db.String, nullable=False, unique=True) # Cannot be null, i.e. it's required. Every user must be unique with email address.
+    password = db.Column(db.String, nullable=False)
+    is_admin = db.Column(db.Boolean, default=False) # Should they have admin rights
+
+@app.cli.command('db_create') # Creates the tables above
 def db_create():
     db.drop_all() # This drops all tables to create the tables fresh
-    db.create_all()
+    db.create_all() 
     print('Created tables')
 
-@app.cli.command('db_seed') 
+@app.cli.command('db_seed') # Creates entries in the tables
 def db_seed():
+
+    users = [ 
+    User(
+        email='admin@spam.com',
+        password='spinynorman',
+        is_admin=True
+    ),
+
+    User(
+        name='John Cleese',
+        email='cleese@spam.com',
+        password='tisbutascratch'
+    )
+]
+
     cards = [
         Card(
             title = 'Start the project',
@@ -75,6 +99,7 @@ def db_seed():
     # db.session.add(card2)
     # db.session.add(card3)
 
+    db.session.add_all(users)
     db.session.add_all(cards)
     db.session.commit() # This commits the entry - similar to git commit -m
 
