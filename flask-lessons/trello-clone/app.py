@@ -3,15 +3,18 @@ from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
 from datetime import date
 import json
+from flask_bcrypt import Bcrypt
 
 app = Flask(__name__) # Always required to begin Flask app
-ma = Marshmallow(app) # Create an instance of Marshmallow and connect with our 'app'
 
 # Set the database URI via SQLAlchemy
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://trello_dev:spameggs123@127.0.0.1:5432/trello'
 
 # create the database object
 db = SQLAlchemy(app)
+
+ma = Marshmallow(app) # Create an instance of Marshmallow and connect with our 'app'
+bcrypt = Bcrypt(app) # Create an instance of Bcrypt for our app
 
 # Create a SQL model - it's an entity in our database. 
 # This is our Card entity / TABLE
@@ -60,14 +63,14 @@ def db_seed():
     users = [ 
     User(
         email='admin@spam.com',
-        password='spinynorman',
+        password=bcrypt.generate_password_hash('spinynorman').decode('utf8'), # Encrypts the pw using bcrypt, formats as utf8 
         is_admin=True
     ),
 
     User(
         name='John Cleese',
         email='cleese@spam.com',
-        password='tisbutascratch'
+        password=bcrypt.generate_password_hash('tisbutascratch').decode('utf8') # Encrypts the pw using bcrypt, formats as utf8
     )
 ]
 
