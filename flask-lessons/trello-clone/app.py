@@ -1,20 +1,23 @@
 from flask import Flask, jsonify, request
 from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
-from datetime import date
+from datetime import date, timedelta
 import json
 from flask_bcrypt import Bcrypt
+from sqlalchemy.exc import IntegrityError
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required
 
 app = Flask(__name__) # Always required to begin Flask app
 
 # Set the database URI via SQLAlchemy
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://trello_dev:spameggs123@127.0.0.1:5432/trello'
 
-# create the database object
-db = SQLAlchemy(app)
+app.config['JWT_SECRET_KEY'] = 'Ministry of Silly Walks'
 
+db = SQLAlchemy(app) # Create the database object
 ma = Marshmallow(app) # Create an instance of Marshmallow and connect with our 'app'
 bcrypt = Bcrypt(app) # Create an instance of Bcrypt for our app
+jwt = JWTManager(app) # Create an instance of JWTManager
 
 # Create a SQL model - it's an entity in our database. 
 # This is our Card entity / TABLE
@@ -113,6 +116,80 @@ def db_seed():
 
     print('Database seeded')
 
+@app.route('/users/register', methods=['POST'])
+def register():
+    try:
+        # Parse incoming POST body through the schema
+        user_info = UserSchema(exclude=['id']).load(request.json) # Runs through UserSchema to provide field validation
+        
+        # Create a new user with the parsed data
+        user = User(
+            email=user_info['email'],
+            password=bcrypt.generate_password_hash(user_info['password']).decode('utf8'),
+            name=user_info.get('name', '')
+        )
+        
+        # Add and commit the new user to the database
+        db.session.add(user)
+        db.session.commit()
+
+        # Return the new user
+        return UserSchema(exclude=['password']).dump(user), 201 # does not pass password back 
+    except IntegrityError:
+        return {'error': 'Email address already in use'}, 409 # Returns when duplicate email created
+
+@app.route('/users/login', methods=['POST'])
+def login():
+    # 1. Parse incoming POST body through the schema
+    user_info = UserSchema(exclude=['id', 'name', 'is_admin']).load(request.json) # Runs through UserSchema to provide field validation, skip the 'exclude'
+
+    # 2. Select user with email that matches the one in the POST body
+    stmt = db.select(User).where(User.email == user_info['email'])
+    user = db.session.scalar(stmt)
+
+    # 3. Check password hash
+    if user and bcrypt.check_password_hash(user.password, user_info['password']): # Matches the hashed passwords
+        # 4. Create a JWT token
+        token = create_access_token(identity=user.email, expires_delta=timedelta(hours=2))
+
+        # 5. Return the token
+        return {'token': token, 'user': UserSchema(exclude = ['password']).dump(user)}
+    else:
+        return {'error': 'Invalid email or password'}, 401
+    print(user)
+        
+    return 'ok'
+
+# Create a route for when a user calls GET /cards
+@app.route('/cards')
+@jwt_required() # If I want to secure this route with JWT - add this decorator
+def all_cards():
+    # select * from cards;
+    stmt = db.select(Card).order_by(Card.title.desc()) # Pass the class itself as a paramater that you want to SELECT on. 
+    cards = db.session.scalars(stmt).all()
+    return CardSchema(many=True).dump(cards) # dumps returns a string (text/html), dump serializes to the native language (Python) / JSON
+
+# Define an index/home page route
+@app.route('/')
+def index():
+    return 'Hello world!'
+
+@app.errorhandler(IntegrityError)
+def integrity_error(err):
+    return {'error': 'Generic IntegrityError!'}, 409
+
+# # Create a route for when a user calls GET /cards
+# @app.route("/cardss", methods=["GET"])
+# def get_cards():
+#     #get all the cards from the database table
+#     stmt = db.select(Card)
+#     cards = db.session.scalars(stmt)
+#     # return CardSchema(many=True).dump(cards)
+
+#     # Convert the cards from the database into a JSON format and store them in result
+#     result = cards_schema.dump(cards)
+#     #return result in JSON format
+#     return jsonify(result)
 
 # CLI COMMANDS
 
@@ -132,48 +209,3 @@ def db_seed():
 
 #     for card in cards:
 #         print(card.__dict__) 
-
-@app.route('/users/register', methods=['POST'])
-def register():
-    # Parse incoming POST body through the schema
-    user_info = UserSchema(exclude=['id']).load(request.json) # Runs through UserSchema to provide field validation
-    
-    # Create a new user with the parsed data
-    user = User(
-        email=user_info['email'],
-        password=bcrypt.generate_password_hash(user_info['password']).decode('utf8'),
-        name=user_info.get('name', '')
-    )
-    
-    # Add and commit the new user to the database
-    db.session.add(user)
-    db.session.commit()
-
-    # Return the new user
-    return UserSchema(exclude=['password']).dump(user), 201 # does not pass password back 
-
-
-@app.route('/cards')
-def all_cards():
-    # select * from cards;
-    stmt = db.select(Card).order_by(Card.title.desc()) # Pass the class itself as a paramater that you want to SELECT on. 
-    cards = db.session.scalars(stmt).all()
-    return CardSchema(many=True).dump(cards) # dumps returns a string (text/html), dump serializes to the native language (Python) / JSON
-
-# Define an index/home page route
-@app.route('/')
-def index():
-    return 'Hello world!'
-
-# # Create a route for when a user calls GET /cards
-# @app.route("/cardss", methods=["GET"])
-# def get_cards():
-#     #get all the cards from the database table
-#     stmt = db.select(Card)
-#     cards = db.session.scalars(stmt)
-#     # return CardSchema(many=True).dump(cards)
-
-#     # Convert the cards from the database into a JSON format and store them in result
-#     result = cards_schema.dump(cards)
-#     #return result in JSON format
-#     return jsonify(result)
