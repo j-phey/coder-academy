@@ -1,23 +1,38 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, abort
 from flask_marshmallow import Marshmallow
 from flask_sqlalchemy import SQLAlchemy
 from datetime import date, timedelta
 import json
 from flask_bcrypt import Bcrypt
 from sqlalchemy.exc import IntegrityError
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
+from os import environ
+
+print(environ)
 
 app = Flask(__name__) # Always required to begin Flask app
 
 # Set the database URI via SQLAlchemy
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://trello_dev:spameggs123@127.0.0.1:5432/trello'
 
-app.config['JWT_SECRET_KEY'] = 'Ministry of Silly Walks'
+app.config['JWT_SECRET_KEY'] = environ.get('JWT_KEY')
 
 db = SQLAlchemy(app) # Create the database object
 ma = Marshmallow(app) # Create an instance of Marshmallow and connect with our 'app'
 bcrypt = Bcrypt(app) # Create an instance of Bcrypt for our app
 jwt = JWTManager(app) # Create an instance of JWTManager
+
+def admin_required():
+    # Check if user is an admin
+    user_email = get_jwt_identity() # Checks the identity from the token
+    stmt = db.select(User).where(User.email == user_email)
+    user = db.session.scalar(stmt)
+    if not user.is_admin:
+        return abort(401)
+
+@app.errorhandler(401)
+def unauthorized(err):
+    return {'error': 'You must be an admin!'}
 
 # Create a SQL model - it's an entity in our database. 
 # This is our Card entity / TABLE
@@ -120,7 +135,7 @@ def db_seed():
 def register():
     try:
         # Parse incoming POST body through the schema
-        user_info = UserSchema(exclude=['id']).load(request.json) # Runs through UserSchema to provide field validation
+        user_info = UserSchema(exclude=['id', "is_admin"]).load(request.json) # Runs through UserSchema to provide field validation
         
         # Create a new user with the parsed data
         user = User(
@@ -164,6 +179,8 @@ def login():
 @app.route('/cards')
 @jwt_required() # If I want to secure this route with JWT - add this decorator
 def all_cards():
+    admin_required()
+
     # select * from cards;
     stmt = db.select(Card).order_by(Card.title.desc()) # Pass the class itself as a paramater that you want to SELECT on. 
     cards = db.session.scalars(stmt).all()
@@ -177,6 +194,7 @@ def index():
 @app.errorhandler(IntegrityError)
 def integrity_error(err):
     return {'error': 'Generic IntegrityError!'}, 409
+
 
 # # Create a route for when a user calls GET /cards
 # @app.route("/cardss", methods=["GET"])
