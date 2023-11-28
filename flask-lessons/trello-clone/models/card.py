@@ -1,4 +1,5 @@
 from setup import db, ma
+from datetime import datetime
 
 # Create a SQL model - it's an entity in our database. 
 # This is our Card entity / TABLE
@@ -7,10 +8,10 @@ class Card(db.Model):
 
     # Creating columns
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100))
+    title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text())
-    status = db.Column(db.Text) # You technically don't need parenthesis if not specifying a limit
-    date_created = db.Column(db.Date) 
+    status = db.Column(db.String(30), default='To Do') # You technically don't need parenthesis if not specifying a limit
+    date_created = db.Column(db.Date, default=datetime.now().strftime('%Y-%m-%d')) 
 
 # create the Card Schema with Marshmallow, 
 # it will provide the serialization needed for converting the data into JSON

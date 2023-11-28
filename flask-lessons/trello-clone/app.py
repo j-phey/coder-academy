@@ -1,5 +1,3 @@
-from flask import abort, jsonify
-from models.card import CardSchema
 from setup import app
 from blueprints.cli_bp import db_commands
 from blueprints.users_bp import users_bp

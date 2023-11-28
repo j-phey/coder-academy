@@ -17,6 +17,7 @@ ma = Marshmallow(app) # Create an instance of Marshmallow and connect with our '
 bcrypt = Bcrypt(app) # Create an instance of Bcrypt for our app
 jwt = JWTManager(app) # Create an instance of JWTManager
 
+
 @app.errorhandler(401)
 def unauthorized(err):
     return {'error': 'You are not authorised!'}
