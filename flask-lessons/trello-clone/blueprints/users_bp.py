@@ -42,10 +42,10 @@ def login():
     # 3. Check password hash
     if user and bcrypt.check_password_hash(user.password, user_info['password']): # Matches the hashed passwords
         # 4. Create a JWT token
-        token = create_access_token(identity=user.email, expires_delta=timedelta(hours=2))
+        token = create_access_token(identity=user.id, expires_delta=timedelta(hours=2))
 
         # 5. Return the token
-        return {'token': token, 'user': UserSchema(exclude = ['password']).dump(user)}
+        return {'token': token, 'user': UserSchema(exclude=["password", 'cards']).dump(user)}
     else:
         return {'error': 'Invalid email or password'}, 401
     print(user)
@@ -59,4 +59,5 @@ def all_users():
     # select * from cards;
     stmt = db.select(User)
     users = db.session.scalars(stmt).all()
+    print(users[0].cards)
     return UserSchema(many=True, exclude = ['password']).dump(users) # dumps returns a string (text/html), dump serializes to the native language (Python) / JSON

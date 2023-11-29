@@ -18,7 +18,7 @@ class Card(db.Model):
     # Creating a foreign key - establishes relationship at the database level with User table
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False) # 'users.id' is table_name.field (from user.py model)
     # SQLAlchemy relationship - nests an instance of a related model in this one
-    user = db.relationship('User') # Pass the model class name for the relationship
+    user = db.relationship('User', back_populates='cards') # Pass the model class name for the relationship. back_populates links the relationship with user model, where ='' is same as db.relationship variable in other table
 
 # create the Card Schema with Marshmallow, 
 # it will provide the serialization needed for converting the data into JSON

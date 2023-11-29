@@ -11,11 +11,11 @@ class User(db.Model): # SPECIFYING A USERS TABLE
     is_admin = db.Column(db.Boolean, default=False) # Should they have admin rights
 
     # Establish relationship with card.py model
-    cards = db.relationship('Card') # Get cards owned by queried user
+    cards = db.relationship('Card', back_populates='user') # Get cards owned by queried user. back_populates links the relationship with card model, where ='' is same as db.relationship variable in other table
 
 # Use Marshmallow
 class UserSchema(ma.Schema):
-    cards = fields.Nested('CardSchema', exclude=['user'])
+    cards = fields.Nested('CardSchema', exclude=['user'], many=True) # Need many=True because cards is a list
 
     class Meta:
         fields = ('id', 'name', 'email', 'password', 'is_admin', 'cards')
