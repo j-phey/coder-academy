@@ -12,6 +12,7 @@ class User(db.Model): # SPECIFYING A USERS TABLE
 
     # Establish relationship with card.py model
     cards = db.relationship('Card', back_populates='user') # Get cards owned by queried user. back_populates links the relationship with card model, where ='' is same as db.relationship variable in other table
+    comments = db.relationship('Comment', back_populates='user') # 'Comment' relationship to Comment model, back populate to this model, user
 
 # Use Marshmallow
 class UserSchema(ma.Schema):
