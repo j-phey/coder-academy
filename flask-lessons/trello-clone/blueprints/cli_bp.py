@@ -15,6 +15,7 @@ def db_create():
 @db_commands.cli.command('seed') # Creates entries in the tables
 def db_seed():
 
+    # CREATE USERS
     users = [ 
     User(
         email='admin@spam.com',
@@ -28,28 +29,34 @@ def db_seed():
         password=bcrypt.generate_password_hash('tisbutascratch').decode('utf8') # Encrypts the pw using bcrypt, formats as utf8
     )
 ]
+    db.session.add_all(users) # All the users first, before the cards
+    db.session.commit() # This commits the entry - similar to git commit -m. Gotta commit users so cards can access the user_id
 
+    # CREATE CARDS
     cards = [
         Card(
             title = 'Start the project',
             description = 'Stage 1 - Create ERD',
             status='Done',
-            date_created = date.today()
+            date_created = date.today(),
+            user_id = users[0].id # aka user_id 1
         ),
 
         Card(
             title = 'ORM Queries',
             description = 'Stage 2 - Implement Crud',
             status='In Progress',
-            date_created = date.today()
+            date_created = date.today(),
+            user_id = users[1].id # aka user_id 2
         ),
 
         Card(
             title = 'Marshmallow',
             description = 'Stage 3 - Implement JSONify of models',
             status='In Progress',
-            date_created = date.today()
-        ) ,
+            date_created = date.today(),
+            user_id = users[0].id # aka user_id 1
+        ),
     ]
     
     # You can add cards one by one
@@ -57,8 +64,7 @@ def db_seed():
     # db.session.add(card2)
     # db.session.add(card3)
 
-    db.session.add_all(users)
-    db.session.add_all(cards)
+    db.session.add_all(cards) # Add the cards
     db.session.commit() # This commits the entry - similar to git commit -m
 
     print('Database seeded')

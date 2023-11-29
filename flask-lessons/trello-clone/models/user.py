@@ -1,4 +1,5 @@
 from setup import db, ma
+from marshmallow import fields
 
 class User(db.Model): # SPECIFYING A USERS TABLE
     __tablename__ = 'users'
@@ -9,7 +10,12 @@ class User(db.Model): # SPECIFYING A USERS TABLE
     password = db.Column(db.String, nullable=False)
     is_admin = db.Column(db.Boolean, default=False) # Should they have admin rights
 
+    # Establish relationship with card.py model
+    cards = db.relationship('Card') # Get cards owned by queried user
+
 # Use Marshmallow
 class UserSchema(ma.Schema):
+    cards = fields.Nested('CardSchema', exclude=['user'])
+
     class Meta:
-        fields = ('id', 'name', 'email', 'password', 'is_admin')
+        fields = ('id', 'name', 'email', 'password', 'is_admin', 'cards')
