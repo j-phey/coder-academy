@@ -1,7 +1,10 @@
+# cli_bp.py sorts out all our database stuff - creating tables, seeding tables, creating rows, seeding rows etc.
+
 from flask import Blueprint
 from setup import db, bcrypt
 from models.card import Card
 from models.user import User
+from models.comment import Comment
 from datetime import date
 
 db_commands = Blueprint('db', __name__)
@@ -66,6 +69,14 @@ def db_seed():
 
     db.session.add_all(cards) # Add the cards
     db.session.commit() # This commits the entry - similar to git commit -m
+
+    comments = [
+        Comment(
+            message = "Comment 1",
+            user_id=users[0].id,
+            card_id=cards[1].id # References the created cards above
+        )
+    ]
 
     print('Database seeded')
 
