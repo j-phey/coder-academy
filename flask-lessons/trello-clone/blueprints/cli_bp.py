@@ -75,10 +75,25 @@ def db_seed():
             message = "Comment 1",
             user_id=users[0].id,
             card_id=cards[1].id # References the created cards above
+        ),
+        Comment(
+            message = "Comment 2",
+            user_id=users[1].id,
+            card_id=cards[1].id # References the created cards above
+        ),
+        Comment(
+            message = "Comment 3",
+            user_id=users[1].id,
+            card_id=cards[0].id # References the created cards above
         )
     ]
 
+    db.session.add_all(comments) # Add the cards
+    db.session.commit() # This commits the entry - similar to git commit -m
+
     print('Database seeded')
+
+
 
 # @app.cli.command('all_cards')
 # def all_cards():

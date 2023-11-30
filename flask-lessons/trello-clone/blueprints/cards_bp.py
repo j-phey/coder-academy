@@ -3,6 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from setup import db
 from models.card import CardSchema, Card
 from auth import admin_required
+from blueprints.comments_bp import comments_bp
 
 cards_bp = Blueprint('cards', __name__, url_prefix='/cards')
 
@@ -32,7 +33,7 @@ def one_card(id):
 @cards_bp.route('/', methods=['POST']) # Can be '/' because we are just POSTing or creating a new card
 @jwt_required()
 def create_card():
-    admin_required()
+    # admin_required()
     card_info = CardSchema(exclude=['id', 'date_created']).load(request.json)
     card = Card(
         title = card_info['title'],
@@ -40,7 +41,7 @@ def create_card():
         status = card_info.get('status', 'To Do'), # If no status, default to 'To Do'
         user_id = get_jwt_identity()
     )
-    
+
     db.session.add(card)
     db.session.commit()
     return CardSchema().dump(card), 201
@@ -75,3 +76,9 @@ def delete_card(id):
         return {}, 200
     else:
         return {'error': 'Card not found'}, 404
+    
+cards_bp.register_blueprint(comments_bp)
+# Registering a BP basically adds the contents of it (routes/commands) to another BP or the app.
+#  Without that, the app/parent bp wouldn't know about it. The connection is not made automatically
+#  because we might want to test the routes in isolation, and Flask has no way to know in advance if
+#  we want to attach them as a child to another bp or to the app directly.

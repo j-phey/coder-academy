@@ -5,7 +5,7 @@ class User(db.Model): # SPECIFYING A USERS TABLE
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
+    name = db.Column(db.String, default='Anonymous')
     email = db.Column(db.String, nullable=False, unique=True) # Cannot be null, i.e. it's required. Every user must be unique with email address.
     password = db.Column(db.String, nullable=False)
     is_admin = db.Column(db.Boolean, default=False) # Should they have admin rights

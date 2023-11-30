@@ -11,3 +11,5 @@ app.register_blueprint(users_bp)
 
 # Call the cards_bp blueprint
 app.register_blueprint(cards_bp)
+
+print(app.url_map) # Shows currently defined routes

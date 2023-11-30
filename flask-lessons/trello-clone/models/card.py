@@ -27,10 +27,11 @@ class Card(db.Model):
 class CardSchema(ma.Schema):
     # Tell marshmallow to nest a UserSchema instance when serialising
     user = fields.Nested('UserSchema', exclude=['password']) # When you nest the user, exclude the password
-    
+    comments = fields.Nested('CommentSchema', many=True, exclude=['card']) # Need many=True when there are many expected (because it's a list)
+
     class Meta:
         # Fields to expose
-        fields = ("id", "title", "description", "status", "date_created", "user") # "user" passes the user details here from the nested field above
+        fields = ("id", "title", "description", "status", "date_created", "user", "comments") # "user" passes the user details here from the nested field above
 
 # single card schema, when one card needs to be retrieved
 card_schema = CardSchema()
