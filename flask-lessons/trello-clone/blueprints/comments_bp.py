@@ -4,7 +4,7 @@ from setup import db
 from models.comment import CommentSchema, Comment
 from auth import admin_required
 
-comments_bp = Blueprint('comments', __name__)
+comments_bp = Blueprint('comments', __name__, url_prefix='/<int:card_id>/comments')
 
 # Create a route for when a user calls GET /comments
 # Get all comments
@@ -31,16 +31,15 @@ comments_bp = Blueprint('comments', __name__)
 # Create a new comment
 # POST /comments
 # POST /cards/<card_id>/comments
-@comments_bp.route('/<int:card_id>/comments', methods=['POST']) 
+@comments_bp.route('/', methods=['POST'])
 @jwt_required()
-def create_comment():
+def create_comment(card_id):
     # admin_required()
     comment_info = CommentSchema(only=['message']).load(request.json)
     comment = Comment(
-        title = comment_info['title'],
-        description = comment_info.get('description', ''), # If no description, just leave blank
-        status = comment_info.get('status', 'To Do'), # If no status, default to 'To Do'
-        user_id = get_jwt_identity()
+        message = comment_info['message'],
+        user_id = get_jwt_identity(),
+        card_id = card_id
     )
     
     db.session.add(comment)
@@ -48,28 +47,28 @@ def create_comment():
     return CommentSchema().dump(comment), 201
 
 # Update a comment
-@comments_bp.route('/<int:id>', methods=['PUT', 'PATCH'])
+# PUT /cards/<card_id>/comments/<comment_id>
+@comments_bp.route('/<int:comment_id>', methods=['PUT', 'PATCH']) # Because this route attaches to the comments blueprint, it implies its a comment id <int:id>
 @jwt_required()
-def update_comment(id):
-    comment_info = CommentSchema(exclude=['id', 'date_created']).load(request.json)
-    stmt = db.select(Comment).filter_by(id=id) # .where(Comment.id == id)
+def update_comment(card_id, comment_id):
+    comment_info = CommentSchema(only=['message']).load(request.json) # We can only update the comment message, so use only=['message']
+    stmt = db.select(Comment).filter_by(id=comment_id) # .where(Comment.id == id)
     comment = db.session.scalar(stmt)
     if comment: # Checks if valid comment id
         # Makes the following changes to these fields
-        comment.title = comment_info.get('title', comment.title) 
-        comment.description = comment_info.get('description', comment.description)
-        comment.status = comment_info.get('status', comment.status)
+        comment.message = comment_info.get('message', comment.message) 
         db.session.commit() # Re-commit it
         return CommentSchema().dump(comment)
     else:
         return {'error': 'Comment not found'}, 404
     
 # Delete a comment
-@comments_bp.route('/<int:id>', methods=['DELETE'])
+# DELETE /cards/<card_id>/comments/<comment_id>
+@comments_bp.route('/<int:comment_id>', methods=['DELETE'])
 @jwt_required()
-def delete_comment(id):
-    admin_required()
-    stmt = db.select(Comment).filter_by(id=id) # .where(Comment.id == id)
+def delete_comment(card_id, comment_id):
+    # admin_required()
+    stmt = db.select(Comment).filter_by(id=comment_id) # .where(Comment.id == id)
     comment = db.session.scalar(stmt)
     if comment: # Checks if valid comment id
         db.session.delete(comment)
