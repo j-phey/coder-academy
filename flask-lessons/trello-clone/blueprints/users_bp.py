@@ -4,7 +4,7 @@ from models.user import User, UserSchema
 from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import create_access_token, jwt_required
 from datetime import timedelta
-from auth import admin_required
+from auth import authorize
 
 users_bp = Blueprint('users', __name__, url_prefix='/users')
 
@@ -55,7 +55,7 @@ def login():
 @users_bp.route('/')
 @jwt_required() # If I want to secure this route with JWT - add this decorator
 def all_users():
-    admin_required()
+    authorize()
     # select * from cards;
     stmt = db.select(User)
     users = db.session.scalars(stmt).all()

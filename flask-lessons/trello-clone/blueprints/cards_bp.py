@@ -2,7 +2,7 @@ from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from setup import db
 from models.card import CardSchema, Card
-from auth import admin_required
+from auth import authorize
 from blueprints.comments_bp import comments_bp
 
 cards_bp = Blueprint('cards', __name__, url_prefix='/cards')
@@ -12,7 +12,7 @@ cards_bp = Blueprint('cards', __name__, url_prefix='/cards')
 @cards_bp.route('/')
 @jwt_required() # If I want to secure this route with JWT - add this decorator
 def all_cards():
-    admin_required()
+    authorize()
     # select * from cards;
     stmt = db.select(Card)
     cards = db.session.scalars(stmt).all()
@@ -54,6 +54,8 @@ def update_card(id):
     stmt = db.select(Card).filter_by(id=id) # .where(Card.id == id)
     card = db.session.scalar(stmt)
     if card: # Checks if valid card id
+        # Check if actual owner of the card
+        authorize(card.user_id) # Compares user_id and the jwt_user_id token in auth.py
         # Makes the following changes to these fields
         card.title = card_info.get('title', card.title) 
         card.description = card_info.get('description', card.description)
@@ -67,10 +69,11 @@ def update_card(id):
 @cards_bp.route('/<int:id>', methods=['DELETE'])
 @jwt_required()
 def delete_card(id):
-    admin_required()
     stmt = db.select(Card).filter_by(id=id) # .where(Card.id == id)
     card = db.session.scalar(stmt)
     if card: # Checks if valid card id
+        # Check if actual owner of the card
+        authorize(card.user_id) # Compares user_id and the jwt_user_id token in auth.py
         db.session.delete(card)
         db.session.commit() # Commit the transaction (delete)
         return {}, 200

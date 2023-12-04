@@ -2,7 +2,7 @@ from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from setup import db
 from models.comment import CommentSchema, Comment
-from auth import admin_required
+from auth import authorize
 
 comments_bp = Blueprint('comments', __name__, url_prefix='/<int:card_id>/comments')
 
@@ -55,6 +55,7 @@ def update_comment(card_id, comment_id):
     stmt = db.select(Comment).filter_by(id=comment_id) # .where(Comment.id == id)
     comment = db.session.scalar(stmt)
     if comment: # Checks if valid comment id
+        authorize(comment.user_id) # Admin or person who made comment
         # Makes the following changes to these fields
         comment.message = comment_info.get('message', comment.message) 
         db.session.commit() # Re-commit it
@@ -71,6 +72,7 @@ def delete_comment(card_id, comment_id):
     stmt = db.select(Comment).filter_by(id=comment_id) # .where(Comment.id == id)
     comment = db.session.scalar(stmt)
     if comment: # Checks if valid comment id
+        authorize(comment.user_id) # Admin or person who made comment
         db.session.delete(comment)
         db.session.commit() # Commit the transaction (delete)
         return {}, 200
