@@ -4,6 +4,7 @@ from flask_marshmallow import Marshmallow
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from os import environ
+from marshmallow.exceptions import ValidationError
 
 app = Flask(__name__) # Always required to begin Flask app
 
@@ -17,7 +18,11 @@ ma = Marshmallow(app) # Create an instance of Marshmallow and connect with our '
 bcrypt = Bcrypt(app) # Create an instance of Bcrypt for our app
 jwt = JWTManager(app) # Create an instance of JWTManager
 
-
 @app.errorhandler(401)
 def unauthorized(err):
     return {'error': 'You are not authorised!'}
+
+# Validation for missing information on registering user, etc. / not a valid email address
+@app.errorhandler(ValidationError)
+def validation_error(err):
+    return {'error': err.messages}

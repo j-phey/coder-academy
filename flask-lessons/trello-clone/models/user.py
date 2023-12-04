@@ -1,5 +1,6 @@
 from setup import db, ma
 from marshmallow import fields
+from marshmallow.validate import Length
 
 class User(db.Model): # SPECIFYING A USERS TABLE
     __tablename__ = 'users'
@@ -17,6 +18,9 @@ class User(db.Model): # SPECIFYING A USERS TABLE
 # Use Marshmallow
 class UserSchema(ma.Schema):
     cards = fields.Nested('CardSchema', exclude=['user'], many=True) # Need many=True because cards is a list
+    email = fields.Email(required=True) # email needs to be an email field (validation). 
+    # required=True catches if user entered email at input
+    password = fields.String(required=True, validate=Length(min=8)) 
 
     class Meta:
         fields = ('id', 'name', 'email', 'password', 'is_admin', 'cards')
