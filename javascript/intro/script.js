@@ -82,7 +82,50 @@
 // Python: def add(x,y):
 //           return x+y
 
-function add(x,y) {
-    return x + y // In JS, we don't need indents, but it's for readability
-}
-console.log(add(1,2))
+// const add = (x,y) => {
+//     return x + y // In JS, we don't need indents, but it's for readability
+// }
+// console.log(add(1,2))
+
+// // Arrow functions
+
+// const Utils = {
+//     add: (x,y) => x + y,
+//     squares: arr.map(x => x ** 2),
+//     double: x => x * 2
+// }
+
+// console.log(Utils.add(1,2))
+// // console.log(square(10))
+
+// const numbers = [12, 50, 44, 32, 2]
+// const result = Utils.squares(numbers)
+// console.log(result)
+
+// Destructuring
+
+// const people = ['Jon', 'Judy', 'James', 'Jill']
+
+// // const first = people[0]
+// // const second = people[1]
+// const [first, second, , fourth] = people // Extracts the 1st, 2nd and 4th elements
+// console.log(first, second, fourth)
+
+// const [f, s, ...others] = people // Extracts the others with ...
+// console.log(f, s, others)
+
+
+// // Concatenation (with destructuring)
+// const bobBirds = ['Robin', 'Crow']
+// const sallyBirds = ['Bluejay', 'Cardinal']
+
+// const allBirds = [...bobBirds, ...sallyBirds, 'Kookaburra']
+
+// console.log(allBirds)
+// console.log(...bobBirds)
+
+// const me = {name: 'Jon', age: 32, favouriteColor: 'red'}
+// const me2 = {...me, favouriteColor: 'blue'}
+
+// console.log(me)
+// console.log(me2)
