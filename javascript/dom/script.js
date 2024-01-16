@@ -41,3 +41,19 @@ const ul = document.querySelector('ul')
 const lis = items.map(item => `<li>${item}</li>`)
 // console.log(lis.join(''))
 ul.innerHTML = lis.join('')
+
+// Handle a mouse click on the h1 element
+
+// document.querySelector('h1').addEventListener('click', () => console.log('mouse click on h1'))
+// document.querySelector('h1').addEventListener('click', event => console.log(event))
+document.querySelector('h1').addEventListener('click', event => event.target.innerText += '!')
+
+// Handle the event to add a item to the dot point list
+const newItem = document.querySelector('#newItem')
+const button = document.querySelector('button')
+
+// button.addEventListener('click', event => console.log(newItem.value)) // Gets the innerText of the input box
+button.addEventListener('click', () => { 
+    ul.innerHTML += `<li>${newItem.value}</li>`
+    newItem.value = ''
+})
