@@ -1,22 +1,22 @@
-// const x = 2
-// const y = 'asd'
+const x = 2
+const y = 'asd'
 
 function adder(a, b) {
     return a + b
 }
 
-function adderPromise(x,y) {
+async function adderPromise(x,y) {
 
-    // const calc = new Promise((resolve, reject) => {
-    return new Promise((resolve, reject) => {
-        if (typeof x === 'number' && typeof y === 'number') { // Only if the two variables are numbers, do the promise
-            const answer = adder(x,y)
-            resolve(answer)
-        } else { // Else, reject it
-            reject('x and y must be numbers')
+    // // const calc = new Promise((resolve, reject) => {
+    // return new Promise((resolve, reject) => {
+    if (typeof x === 'number' && typeof y === 'number') { // Only if the two variables are numbers, do the promise
+        const answer = adder(x,y)
+        // resolve(answer)
+        return answer
+    } else { // Else, reject it
+        reject('x and y must be numbers')
         }
-    })
-}
+    }
 
 // console.log(calc)
 // calc 
@@ -31,10 +31,13 @@ function adderPromise(x,y) {
 //     .catch(err => console.error(err))
 
 // Another way of doing it...
-adderPromise(10, 20)
-    .then(value => adderPromise(value, 100))
-    .then(answer => console.log(answer))
-    .catch(err => console.error(err))
+async function doStuff() {
+    const value = await adderPromise(10, 20)
+    console.log(value)
+}
+    // .then(value => adderPromise(value, 100))
+    // .then(answer => console.log(answer))
+    // .catch(err => console.error(err))
 
 
 // adderPromise(150, 300)
