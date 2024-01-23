@@ -9,7 +9,7 @@ const entries = [
     { category: 'Gaming', content: 'Skyrim is the best' }
 ]
 
-mongoose.connect('mongodb+srv://jonphey:AVoJN8E-L_eWYy6T@cluster0.5c5khwh.mongodb.net/journal?retryWrites=true&w=majority')
+mongoose.connect('')
     .then(m => console.log(m.connection.readyState === 1 ? 'MongoDB connected!' : 'MongoDB failed to connect'))
     .catch(err => console.error(err))
 
