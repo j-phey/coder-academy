@@ -1,12 +1,7 @@
 import express from 'express'
-import { EntryModel } from './db.js'
+import { EntryModel, CategoryModel } from './db.js'
 
 const categories = ['Food', 'Gaming', 'Coding', 'Other']
-
-
-
-
-
 
 const app = express()
 
@@ -18,14 +13,16 @@ app.use(express.json())
 app.get('/', (req, res) => res.send({ info: 'Journal API'})) 
 
 // GET /categories
-app.get('/categories', (req, res) => res.send(categories))
+app.get('/categories', async (req, res) => res.send(await CategoryModel.find()))
 
 // GET /entries
 app.get('/entries', async (req, res) => res.send(await EntryModel.find()))
 
 // GET a single entry from /entries
-app.get('/entries/:id', (req, res) =>  {
-    const entry = entries[req.params.id -1]
+app.get('/entries/:id', async (req, res) =>  {
+    // const entry = await EntryModel.findOne({ _id: req.params.id }) // findOne returns a single entry, find() returns an array
+    const entry = await EntryModel.findById(req.params.id) 
+    console.log(entry)
     if (entry) {
         res.send(entry)
     } else {
@@ -48,7 +45,37 @@ app.post('/entries', async (req, res) => {
         res.status(201).send(insertedEntry)
     }
     catch (err) {
-        res.status(400).send({ error: err.message })
+        res.status(500).send({ error: err.message })
+    }
+})
+
+// PUT /entries/id
+app.put('/entries/:id', async (req, res) => {
+    try {
+        const updatedEntry = await EntryModel.findByIdAndUpdate(req.params.id, req.body, { new: true})
+        if (updatedEntry) {
+            res.send(updatedEntry) // 200 default status
+        } else {
+            res.status(404).send({ error: 'Entry not found' })
+        }
+    }
+    catch (err) {
+        res.status(500).send({ error: err.message })
+    }
+})
+
+// DELETE /entries/id
+app.delete('/entries/:id', async (req, res) => {
+    try {
+        const deletedEntry = await EntryModel.findByIdAndDelete(req.params.id)
+        if (deletedEntry) {
+            res.sendStatus(204)
+        } else {
+            res.status(404).send({ error: 'Entry not found' })
+        }
+    }
+    catch (err) {
+        res.status(500).send({ error: err.message })
     }
 })
 

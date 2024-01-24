@@ -18,6 +18,12 @@ const closeConnection = () => {
 
 // process.on('SIGTERM', () => mongoose.disconnect())
 
+const categoriesSchema = new mongoose.Schema({
+    name: { type: String, required: true }
+})
+
+const CategoryModel = mongoose.model('Category', categoriesSchema)
+
 const entriesSchema = new mongoose.Schema({
         category: String,
         content: String,
@@ -26,4 +32,4 @@ const entriesSchema = new mongoose.Schema({
 
 const EntryModel = mongoose.model('Entry', entriesSchema)
 
-export { closeConnection, EntryModel }
+export { closeConnection, EntryModel, CategoryModel }
