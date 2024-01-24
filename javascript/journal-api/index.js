@@ -1,25 +1,12 @@
 import express from 'express'
-import mongoose from 'mongoose' 
+import { EntryModel } from './db.js'
 
 const categories = ['Food', 'Gaming', 'Coding', 'Other']
 
-const entries = [
-    { category: 'Food', content: 'Pizza is yummy!' },
-    { category: 'Coding', content: 'Coding is fun!' },
-    { category: 'Gaming', content: 'Skyrim is the best' }
-]
 
-mongoose.connect('')
-    .then(m => console.log(m.connection.readyState === 1 ? 'MongoDB connected!' : 'MongoDB failed to connect'))
-    .catch(err => console.error(err))
 
-    const entriesSchema = new mongoose.Schema({
-        category: String,
-        content: String,
 
-})
 
-const EntryModel = mongoose.model('Entry', entriesSchema)
 
 const app = express()
 
@@ -34,7 +21,7 @@ app.get('/', (req, res) => res.send({ info: 'Journal API'}))
 app.get('/categories', (req, res) => res.send(categories))
 
 // GET /entries
-app.get('/entries', (req, res) => res.send(entries))
+app.get('/entries', async (req, res) => res.send(await EntryModel.find()))
 
 // GET a single entry from /entries
 app.get('/entries/:id', (req, res) =>  {
@@ -65,4 +52,4 @@ app.post('/entries', async (req, res) => {
     }
 })
 
-app.listen(4001)
+app.listen(4003)
