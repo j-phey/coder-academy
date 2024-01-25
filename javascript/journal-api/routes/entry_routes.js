@@ -4,12 +4,12 @@ import { Router } from "express"
 const router = Router()
 
 // GET /entries
-router.get('/entries', async (req, res) => res.send(await EntryModel.find()))
+router.get('/', async (req, res) => res.send(await EntryModel.find().populate('category'))) // .populate('category') embeds the entire category doc in the GET request
 
-// GET a single entry from /entries
-router.get('/entries/:id', async (req, res) =>  {
+// GET a single entry from 
+router.get('/:id', async (req, res) =>  {
     // const entry = await EntryModel.findOne({ _id: req.params.id }) // findOne returns a single entry, find() returns an array
-    const entry = await EntryModel.findById(req.params.id) 
+    const entry = await EntryModel.findById(req.params.id).populate('category') 
     console.log(entry)
     if (entry) {
         res.send(entry)
@@ -18,8 +18,8 @@ router.get('/entries/:id', async (req, res) =>  {
     }
 })
 
-// POST /entries
-router.post('/entries', async (req, res) => {
+// POST 
+router.post('/', async (req, res) => {
     try {
         const cat = await CategoryModel.findOne({name: req.body.category})
         if (cat) {
@@ -36,8 +36,8 @@ router.post('/entries', async (req, res) => {
     }
 })
 
-// PUT /entries/id
-router.put('/entries/:id', async (req, res) => {
+// PUT /id
+router.put('/:id', async (req, res) => {
     try {
         const updatedEntry = await EntryModel.findByIdAndUpdate(req.params.id, req.body, { new: true})
         if (updatedEntry) {
@@ -52,7 +52,7 @@ router.put('/entries/:id', async (req, res) => {
 })
 
 // DELETE /entries/id
-router.delete('/entries/:id', async (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
         const deletedEntry = await EntryModel.findByIdAndDelete(req.params.id)
         if (deletedEntry) {

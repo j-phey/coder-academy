@@ -13,9 +13,13 @@ app.use(express.json())
 // app.get('/', (req, res) => res.send('<h2>Home</h2>')) // Prints 'Home' in the GET request. Can mark it up with HTML like <h2>
 app.get('/', (req, res) => res.send({ info: 'Journal API'})) 
 
+// TODO: Move /categories to routes folder
+// TODO: Complete categories CRUD
+// (optional) TODO ADVANCED: Modify GET /categories/:id to embed an array of all the entries in that category
+
 // GET /categories
 app.get('/categories', async (req, res) => res.send(await CategoryModel.find()))
 
-app.use(entryRoutes) // .use is for middleware
+app.use('/entries',entryRoutes) // .use is for middleware
 
 app.listen(4003)
