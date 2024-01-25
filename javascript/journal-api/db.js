@@ -18,18 +18,18 @@ const closeConnection = () => {
 
 // process.on('SIGTERM', () => mongoose.disconnect())
 
+const entriesSchema = new mongoose.Schema({
+        category: { type: mongoose.ObjectId, ref: 'Category' },
+        content: { type: String, required: true }
+}) // Ensures the sub-documents don't have ids
+
+const EntryModel = mongoose.model('Entry', entriesSchema)
+
 const categoriesSchema = new mongoose.Schema({
     name: { type: String, required: true }
+    // entries: [entriesSchema]
 })
 
 const CategoryModel = mongoose.model('Category', categoriesSchema)
-
-const entriesSchema = new mongoose.Schema({
-        category: String,
-        content: String,
-
-})
-
-const EntryModel = mongoose.model('Entry', entriesSchema)
 
 export { closeConnection, EntryModel, CategoryModel }
