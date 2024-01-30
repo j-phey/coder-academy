@@ -1,13 +1,16 @@
 import React, { useState } from 'react'
 
+const ShowCount = ({ value }) => {
+  return <p>You have clicked {value} times</p>
+}
+
 const App = () => {
-  // let count = 0
-  let [count, setCount] = useState(0)
-  console.log(count)
+  let [count, setCount] = useState(0) 
+
   return (
     <>
-      <h1>State</h1>
-      <p>You have clicked {count} times</p>
+      <h1>State</h1> 
+      <ShowCount value={count} />
       <button onClick={() => setCount(count + 1)}>Click me!</button>
     </>
   )
