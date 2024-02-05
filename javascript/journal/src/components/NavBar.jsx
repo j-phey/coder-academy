@@ -1,4 +1,5 @@
 import React, { useRef } from "react"
+import { Link } from "react-router-dom"
 
 const NavBar = () => {
   const navBarRef = useRef()
@@ -20,11 +21,11 @@ const NavBar = () => {
                 </a>
             </div>
 
-            <div id="navbarBasicExample" ref={navBarRef} className="navbar-menu">
+            <div id="navbarBasicExample" onClick={toggleHamburger} ref={navBarRef} className="navbar-menu">
                 <div className="navbar-start">
-                    <a href="/" className="navbar-item">Home</a>
-                    <a href="/category" className="navbar-item">Select Category</a>
-                    <a href="/entry/new" className="navbar-item">New Entry</a>
+                    <Link to="/" className="navbar-item">Home</Link>
+                    <Link to="/category" className="navbar-item">Select Category</Link>
+                    <Link to="/entry/new" className="navbar-item">New Entry</Link>
                 </div>
             </div>
         </nav>

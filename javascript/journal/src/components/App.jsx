@@ -16,7 +16,7 @@ const App = () => {
           <Route path='/' element={<p>Hello</p>} />
           <Route path='/category' element={<CategorySelection />} />
           <Route path='/entry'>
-            <Route path='new' element={<NewEntry />} />
+            <Route path='new/:cat_id' element={<NewEntry />} />
           </Route>
           <Route path='*' element={<h3>Page not found</h3>} />
         </Routes>
