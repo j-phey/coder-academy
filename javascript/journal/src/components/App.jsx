@@ -11,7 +11,7 @@ const App = () => {
       
       <BrowserRouter> 
         <NavBar />
-        <h1>Journal</h1>
+        
         <Routes>
           <Route path='/' element={<p>Hello</p>} />
           <Route path='/category' element={<CategorySelection />} />
