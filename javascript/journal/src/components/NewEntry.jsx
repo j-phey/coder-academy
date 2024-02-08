@@ -1,22 +1,25 @@
 import React, { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 const NewEntry = ({ categories, addEntry }) => { // pass categories as a prop
     const params = useParams()
     const [entry, setEntry] = useState('')
+    const nav = useNavigate()
   
-    function createEntry(e) {
+    async function createEntry(e) {
         e.preventDefault()
         // Create a new entry
-        addEntry(params.cat_id, entry)
+        const id = await addEntry(params.cat_id, entry)
         // 3. Clear input textarea
         setEntry('')
+        // 4. Redirect the browser to the new entry
+        nav(`/entry/${id}`)
     }
 
     return (
     <>
-    {/* // Categories as a prop, cat.id as an index - renders on front end as 'New entry in category Gaming' */}
-    <h3>New entry in category {categories[params.cat_id]}</h3> 
+    {/* // If categories[id] exists or is truthy, access the name. If not, don't */}
+    <h3>New entry in category {categories[params.cat_id]?.name}</h3> 
     {/* form>(textarea+button) */}
     {/* preventDefault prevents reload on button press */}
     <form className="section" onSubmit={createEntry}>
