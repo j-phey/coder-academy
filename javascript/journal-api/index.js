@@ -1,11 +1,13 @@
 import express from 'express'
 import { CategoryModel } from './db.js'
 import entryRoutes from './routes/entry_routes.js'
+import cors from 'cors'
 
 // const categories = ['Food', 'Gaming', 'Coding', 'Other']
 
 const app = express()
 
+app.use(cors()) // Needed to link API to FE
 app.use(express.json())
 
 // GET / (home/index)
